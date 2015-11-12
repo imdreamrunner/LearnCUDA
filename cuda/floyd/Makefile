@@ -175,6 +175,7 @@ ALL_CCFLAGS += $(EXTRA_NVCCFLAGS)
 ALL_CCFLAGS += $(addprefix -Xcompiler ,$(CCFLAGS))
 ALL_CCFLAGS += $(addprefix -Xcompiler ,$(EXTRA_CCFLAGS))
 ALL_CCFLAGS += --std=c++11  # Use C++ 11
+ALL_CCFLAGS += -O3 # Use C++ 11
 
 ALL_LDFLAGS :=
 ALL_LDFLAGS += $(ALL_CCFLAGS)
@@ -217,7 +218,7 @@ endif
 # Target rules
 all: build
 
-build: apsp
+build: apsp_basic apsp_coalescing apsp_sm apsp_all
 
 check.deps:
 ifeq ($(SAMPLE_ENABLED),0)
@@ -232,16 +233,34 @@ apsp.o: apsp.cu
 MatUtil.o: MatUtil.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-floyd.o: floyd.cu
+floyd_basic.o: floyd_basic.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-apsp: apsp.o floyd.o MatUtil.o
+floyd_coalescing.o: floyd_coalescing.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+floyd_sm.o: floyd_sm.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+floyd_all.o: floyd_all.cu
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+apsp_basic: apsp.o MatUtil.o floyd_basic.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+
+apsp_coalescing: apsp.o MatUtil.o floyd_coalescing.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+
+apsp_sm: apsp.o MatUtil.o floyd_sm.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
+
+apsp_all: apsp.o MatUtil.o floyd_all.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 
 run: build
-	$(EXEC) ./apsp 128
+	$(EXEC) ./apsp_basic 1024
 
 clean:
-	rm -f apsp apsp.o floyd.o MatUtil.o
+	rm -f apsp_basic apsp_coalescing apsp_sm apsp_all *.o
 
 clobber: clean

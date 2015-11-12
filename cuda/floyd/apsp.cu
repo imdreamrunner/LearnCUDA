@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <sys/time.h>
 
 // includes CUDA
 #include <cuda_runtime.h>
@@ -48,8 +49,8 @@ int main(int argc, char **argv) {
     gettimeofday(&end_time, NULL);
     int parallel_time = time_diff(start_time, end_time);
 
-    cout << "Sequential time: " << sequential_time << " ns" << endl;
-    cout << "  Parallel time: " << parallel_time << " ns" << endl;
+    cout << "Sequential time: " << sequential_time << " us" << endl;
+    cout << "  Parallel time: " << parallel_time << " us" << endl;
     cout << "        Speedup: " << (1.0 * sequential_time / parallel_time) << endl;
 
     if (CmpArray(mat, ans, num_node)) {
