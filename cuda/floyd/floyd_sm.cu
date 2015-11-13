@@ -7,8 +7,8 @@
 #include "floyd.h"
 
 
-#define MAX_MAT_SIZE 2048
-#define MAX_BLOCK_SIZE 512
+#define MAX_MAT_SIZE 4096
+#define MAX_BLOCK_SIZE 1024
 
 using namespace std;
 
@@ -36,7 +36,9 @@ __global__ void update_mat_on_k(const int size_mat, const int k, int *mat_global
         row_shared[threadIdx.x] = mat_global[k * size_mat + i];
         col_shared[threadIdx.x] = mat_global[i * size_mat + k];
     }
+    __syncthreads();
     update_distance(size_mat, i, j, k, mat_global, row_shared, col_shared);
+    __syncthreads();
 }
 
 

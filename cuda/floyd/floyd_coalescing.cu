@@ -9,13 +9,13 @@
 
 __device__ inline void update_distance(const int size_mat, const int i, 
                         const int j, const int k, int *mat_global) {
-  int i0 = i * size_mat + j;
-  int i1 = i * size_mat + k;
-  int i2 = k * size_mat + j;
-  if (mat_global[i1] != -1 && mat_global[i2] != -1) {
-    int sum = (mat_global[i1] + mat_global[i2]);
-    if (mat_global[i0] == -1 || sum < mat_global[i0]) mat_global[i0] = sum;
-  }
+    int i0 = i * size_mat + j;
+    int i1 = i * size_mat + k;
+    int i2 = k * size_mat + j;
+    if (mat_global[i1] != -1 && mat_global[i2] != -1) {
+        int sum = (mat_global[i1] + mat_global[i2]);
+        if (mat_global[i0] == -1 || sum < mat_global[i0]) mat_global[i0] = sum;
+    }
 }
 
 
